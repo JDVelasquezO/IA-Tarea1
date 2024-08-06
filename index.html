@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IA1 - 201800722</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .log {
+            margin-top: 20px;
+        }
+        .log-entry {
+            margin-bottom: 10px;
+        }
+        .separator {
+            margin: 20px 0;
+            border-top: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>IA 1 - 201800722</h1>
+    <div class="log" id="log"></div>
+
+    <script>
+        function reflexAgent(location, state) {
+            if (state === "DIRTY") {
+                return 'CLEAN';
+            } else if (location === 'A') {
+                return 'RIGHT';
+            } else if (location === 'B') {
+                return 'LEFT';
+            }
+        }
+
+        function generateAllStates(locations, cleanliness) {
+            let states = [];
+            for (let loc of locations) {
+                for (let stateA of cleanliness) {
+                    for (let stateB of cleanliness) {
+                        states.push([loc, stateA, stateB]);
+                    }
+                }
+            }
+            return states;
+        }
+
+        function logMessage(message) {
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = message;
+            logDiv.appendChild(entry);
+        }
+
+        function test(location, stateA, stateB) {
+            let states = [location, stateA, stateB];
+            let interval = setInterval(() => {
+                location = states[0];
+                let state = location === 'A' ? states[2] : states[1];
+                let action = reflexAgent(location, state);
+                logMessage(`Location: ${location} | Action: ${action}`);
+
+                if (states.slice(1).every(s => s === "CLEAN")) {
+                    logMessage("---------------------------------------------------");
+                    clearInterval(interval);
+                    return;
+                }
+
+                if (action === "CLEAN") {
+                    states[1] = "CLEAN";
+                    states[2] = "CLEAN";
+                } else if (action === "RIGHT") {
+                    states[0] = 'B';
+                } else if (action === "LEFT") {
+                    states[0] = 'A';
+                }
+            }, 1000);
+        }
+
+        let locations = ["A", "B"];
+        let cleanliness = ["DIRTY", "CLEAN"];
+
+        let possibleStates = generateAllStates(locations, cleanliness);
+
+        for (let state of possibleStates) {
+            test(...state);
+        }
+    </script>
+</body>
+</html>
